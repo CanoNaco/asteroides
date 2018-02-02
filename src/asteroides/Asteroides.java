@@ -28,20 +28,25 @@ import javafx.stage.Stage;
 public class Asteroides extends Application {
     //Nave
     Polygon nave = new Polygon ();
+    //variable angulo
     double angulo;
+    //variable direccion (aplicado de 0 a 359 grados)
     double direccion;
+    //variable direccion convertida en radianes
     double direccionRAD;
+    //variable direccion X aplicando seno del angulo
     double dirX;
+    //variable direccion Y aplicando coseno del angulo
     double dirY;
-    
-    double velNave=3;
-    
-    int velGiro=7;
+    //variable de velocidad de la nave
+    double velNave;
+    //variable de velocidad de giro
+    int velGiro;
     //Variables de la posicion nave
-    double posx;
-    double posy;
+    double posX = 400;
+    double posY = 200;
     
-        
+          
     //Variables ventana
     final int ventanax =800;
     final int ventanay =400;
@@ -51,12 +56,12 @@ public class Asteroides extends Application {
     @Override
     public void start(Stage primaryStage) {
         Pane root = new Pane();
-        ventana = new Scene(root, ventanax, ventanay, Color.BLACK);
+        ventana = new Scene(root, ventanax, ventanay, Color.WHITE);
         primaryStage.setScene(ventana);
         primaryStage.show();
         
         
-        nave.setFill(Color.BLUE);
+        nave.setFill(Color.RED);
         nave.getPoints().addAll(new Double[]{
             0.0, -30.0,
             10.0, 0.0,
@@ -64,26 +69,32 @@ public class Asteroides extends Application {
             -10.0, 0.0});
         root.getChildren().add(nave);
        
-        nave.setLayoutX(100);
-        nave.setLayoutY(100);
-        
-        
-            
-        
         ventana.setOnKeyPressed((KeyEvent event) -> {
+            
             switch(event.getCode()){
                 case RIGHT:
-                    angulo+= velGiro;
+                    velGiro = 2;
                     break;
                 case LEFT:
-                    angulo-= velGiro;
+                    velGiro = -2;
                     break;
                 case UP:
-                    dirX += velNave;
-                    dirY += velNave;
+                    dirX = Math.sin(direccionRAD);
+                    dirY = Math.cos(direccionRAD);
+                    velNave += 0.1;
+                    if (velNave >= 2) {
+                        velNave = 2;
+                    };
+                    break;
             }
         });
-        animationNave.start(); //Llamada a la animación
+        
+        ventana.setOnKeyReleased((KeyEvent event) -> {
+            velGiro = 0;
+        });
+
+        //Llamada a la animación
+        animationNave.start();
     }//Cierre Método Start
     
     AnimationTimer animationNave = new AnimationTimer() {
@@ -92,11 +103,17 @@ public class Asteroides extends Application {
                 
                 direccion = angulo % 360;
                 direccionRAD = Math.toRadians(direccion);
-                dirX = Math.sin(direccionRAD);
-                dirY = Math.cos(direccionRAD);
                 
+                
+                
+                angulo += velGiro;
                 nave.setRotate(direccion);
-                nave.;
+                
+                posX += (dirX * velNave);
+                posY += (-dirY * velNave);
+                
+                nave.setLayoutX(posX);
+                nave.setLayoutY(posY);
                 
             }
         };
